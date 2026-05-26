@@ -1,0 +1,22 @@
+name: AWS OIDC Test
+on:
+  push:
+    branches: [ feature/sqs ] # Para disparar mal envies o código
+  workflow_dispatch:          # Permite clicar no botão manual se preferires
+permissions:
+  id-token: write             # Obrigatório para pedir o token OIDC à AWS
+  contents: read              # Permissão padrão para ler os teus ficheiros
+jobs:
+  whoami:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-east-1 # Ajusta para a tua região (ex: eu-west-1)
+
+      - name: Verify AWS Connection
+        run: aws sts get-caller-identity
