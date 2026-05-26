@@ -1,0 +1,12 @@
+[Unit]
+Description=Product Service Application
+After=network.target
+
+[Service]
+User={{ app_user }}
+WorkingDirectory={{ app_directory }}/product-service
+ExecStart=/usr/bin/java -jar target/product-service-1.0.jar
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

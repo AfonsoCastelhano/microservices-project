@@ -1,0 +1,43 @@
+---
+- name: Configure Web Servers
+  hosts: web_servers
+  become: yes
+  tasks:
+    - name: Update system packages
+      yum:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Pull application image
+      docker_image:
+        name: your-username/product-service:1.0
+        source: pull
+
+    - name: Run application container
+      docker_container:
+        name: product-service
+        image: your-username/product-service:1.0
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "8080:8080"
+        env:
+          SPRING_PROFILES_ACTIVE: "production"
